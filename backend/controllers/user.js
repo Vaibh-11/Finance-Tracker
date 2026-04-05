@@ -26,28 +26,45 @@ module.exports.signUp = async (req, res) => {
       return res.status(400).send("Email already registered");
     }
 
+    // ✅ Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    otpStore.set(email, { username, email, password, otp });
-
-    console.log("Sending signup OTP to:", email);
-
-    // ✅ Send email FIRST
-    await resend.emails.send({
-      from: "solankivaibhav589@gmail.com",
-      to: email,
-      subject: "Signup OTP Verification",
-      text: `Your OTP is ${otp}`,
+    // ✅ Store OTP
+    otpStore.set(email, {
+      username,
+      email,
+      password,
+      otp,
+      expires: Date.now() + 5 * 60 * 1000,
     });
 
-    console.log("✅ Email sent via Resend");
+    console.log("Signup OTP:", otp);
 
-    // ✅ VERY IMPORTANT
+    // ✅ Send Email via Brevo
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          email: "solankivaibhav589@gmail.com", // verified sender
+          name: "Finance Tracker",
+        },
+        to: [{ email }],
+        subject: "Signup OTP Verification",
+        textContent: `Your OTP is ${otp}`,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    console.log("✅ Signup OTP sent via Brevo");
+
     return res.status(200).send("OTP sent to email");
   } catch (err) {
-    console.log("❌ Resend error:", err);
-
-    // ✅ VERY IMPORTANT
+    console.log("❌ Brevo Error:", err.response?.data || err.message);
     return res.status(500).send("Failed to send OTP");
   }
 };
