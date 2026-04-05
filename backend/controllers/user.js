@@ -192,16 +192,17 @@ module.exports.forgotPassword = async (req, res) => {
       return res.status(404).send("User not found");
     }
 
-    // 🔥 Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    // 🔥 Store OTP
     otpStore.set(email, {
       otp,
-      expires: Date.now() + 5 * 60 * 1000, // 5 min
+      expires: Date.now() + 5 * 60 * 1000,
     });
 
-    // 🔥 Send Email
+    // ✅ SEND RESPONSE IMMEDIATELY
+    res.send("OTP sent to email");
+
+    // 🔥 Send email AFTER response (async)
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -210,15 +211,16 @@ module.exports.forgotPassword = async (req, res) => {
       },
     });
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Password Reset OTP",
-      text: `Your OTP is ${otp}`,
-    });
-
-    res.send("OTP sent to email");
+    transporter
+      .sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Password Reset OTP",
+        text: `Your OTP is ${otp}`,
+      })
+      .catch((err) => console.log("Mail error:", err));
   } catch (err) {
+    console.log(err);
     res.status(500).send(err.message);
   }
 };
