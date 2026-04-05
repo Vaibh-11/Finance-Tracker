@@ -21,7 +21,6 @@ const Login = () => {
         { withCredentials: true },
       );
       navigate("/allTransactions");
-      window.location.reload();
     } catch (err) {
       setError(err?.response?.data);
     }
