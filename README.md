@@ -63,14 +63,7 @@ finance-tracker/
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
 
-```
-git clone https://github.com/your-username/finance-tracker.git
-cd finance-tracker
-```
-
----
 
 ## 🔧 Backend Setup
 
