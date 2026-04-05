@@ -21,7 +21,6 @@ const Login = () => {
         { withCredentials: true },
       );
       navigate("/allTransactions");
-      window.location.href = "/allTransactions";
     } catch (err) {
       setError(err?.response?.data);
     }
