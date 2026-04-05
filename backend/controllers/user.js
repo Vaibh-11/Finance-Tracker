@@ -218,7 +218,8 @@ module.exports.forgotPassword = async (req, res) => {
         subject: "Password Reset OTP",
         text: `Your OTP is ${otp}`,
       })
-      .catch((err) => console.log("Mail error:", err));
+      .then(() => console.log("✅ Email sent"))
+      .catch((err) => console.log("❌ Mail error:", err));
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message);
