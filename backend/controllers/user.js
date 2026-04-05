@@ -2,6 +2,9 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const { Resend } = require("resend");
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const User = require("../models/usermodel");
 
@@ -201,40 +204,17 @@ module.exports.forgotPassword = async (req, res) => {
 
     // ✅ SEND RESPONSE IMMEDIATELY
     res.send("OTP sent to email");
-    console.log("MAIL USER:", process.env.EMAIL_USER);
-    console.log("MAIL PASS:", process.env.EMAIL_PASS);
 
-    const transporter = nodemailer.createTransport({
-      host: "sandbox.smtp.mailtrap.io",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Password Reset OTP",
+      text: `Your OTP is ${otp}`,
     });
-    console.log("MAIL USER:", process.env.EMAIL_USER);
-    console.log("MAIL PASS:", process.env.EMAIL_PASS);
 
-    transporter
-      .sendMail({
-        from: "test@mailtrap.io",
-        to: email,
-        subject: "Password Reset OTP",
-        text: `Your OTP is ${otp}`,
-      })
-      .then((info) => {
-        console.log("✅ Email sent:", info);
-      })
-      .catch((err) => {
-        console.log("❌ Mail error FULL:", JSON.stringify(err, null, 2));
-      })
-      .then(() => console.log("✅ Email sent"))
-
-      .catch((err) => console.log("❌ Mail error:", err));
+    console.log("✅ Email sent via Resend");
   } catch (err) {
-    console.log(err);
-    res.status(500).send(err.message);
+    console.log("❌ Resend error:", err);
   }
 };
 
