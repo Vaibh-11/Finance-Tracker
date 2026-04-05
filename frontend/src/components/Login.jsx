@@ -20,6 +20,7 @@ const Login = () => {
         },
         { withCredentials: true },
       );
+      dispatch(setUser(response.data));
       navigate("/allTransactions");
     } catch (err) {
       setError(err?.response?.data);
