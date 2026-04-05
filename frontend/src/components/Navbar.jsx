@@ -1,77 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { clearUser } from "../utils/authSlice";
 import api from "../utils/axios";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const fetchProfile = async () => {
-    try {
-      const res = await api.get("/user/getProfile");
-      setUser(res.data.user);
-      console.log(res.data.user);
-    } catch (err) {
-      setUser(null);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   const handleLogout = async () => {
     try {
-      await api.post("/user/logout");
-      setUser(null);
+      await api.post("/user/logout", {}, { withCredentials: true });
+
+      dispatch(clearUser()); // ✅ update Redux
       navigate("/login");
     } catch (err) {
-      console.log(err.message);
+      console.log("Logout error:", err);
     }
   };
 
   return (
-    <div className="navbar bg-base-100 shadow-md px-4">
-      <div className="flex-1">
-        <Link to="/" className="text-xl font-bold text-primary">
-          💰 Finance Tracker
-        </Link>
-      </div>
+    <div className="flex justify-between items-center px-6 py-4 bg-gray-800 text-white shadow-md">
+      {/* Logo / Title */}
+      <h1
+        className="text-xl font-bold cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        Finance Tracker
+      </h1>
 
-      <div className="flex-none">
-        <ul className="menu menu-horizontal gap-2 items-center">
-          {user ? (
-            <>
-              <li>
-                <Link to="/allTransactions">All Transactions</Link>
-              </li>
+      {/* Right Side */}
+      <div className="flex items-center gap-4">
+        {user ? (
+          <>
+            {/* Welcome */}
+            <span className="hidden sm:block">
+              Hello, <span className="font-semibold">{user.username}</span>
+            </span>
 
-              <li>
-                <Link to="/profile">Profile</Link>
-              </li>
+            {/* Links */}
+            <Link to="/allTransactions" className="hover:underline">
+              Dashboard
+            </Link>
 
-              <li>
-                <button className="btn btn-error btn-sm" onClick={handleLogout}>
-                  Logout
-                </button>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link to="/login" className="btn btn-primary btn-sm">
-                  Login
-                </Link>
-              </li>
-
-              <li>
-                <Link to="/register" className="btn btn-outline btn-sm">
-                  Signup
-                </Link>
-              </li>
-            </>
-          )}
-        </ul>
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="hover:underline">
+              Login
+            </Link>
+            <Link to="/register" className="hover:underline">
+              Signup
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,70 +1,94 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { clearUser } from "../utils/authSlice";
+import "../index.css";
+
 import api from "../utils/axios";
 
-const Navbar = () => {
-  const user = useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
+  const handleLogin = async () => {
     try {
-      await api.post("/user/logout", {}, { withCredentials: true });
-
-      dispatch(clearUser()); // ✅ update Redux
-      navigate("/login");
+      const response = await api.post(
+        "/user/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true },
+      );
+      dispatch(setUser(response.data));
+      navigate("/allTransactions");
     } catch (err) {
-      console.log("Logout error:", err);
+      setError(err?.response?.data);
     }
   };
 
   return (
-    <div className="flex justify-between items-center px-6 py-4 bg-gray-800 text-white shadow-md">
-      {/* Logo / Title */}
-      <h1
-        className="text-xl font-bold cursor-pointer"
-        onClick={() => navigate("/")}
-      >
-        Finance Tracker
-      </h1>
+    <div className="flex justify-center ">
+      <div className="card card-border bg-base-300 w-96 mt-5">
+        <div className="card-body">
+          <h2 className="card-title justify-center">Login Form</h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+            className="p-3 mt-5"
+          >
+            <input
+              style={{
+                border: "2px solid black",
+                borderRadius: "3px",
+                width: "100%",
+              }}
+              className="input p-3"
+              type="email"
+              value={email}
+              placeholder="Enter your Email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+            <br />
 
-      {/* Right Side */}
-      <div className="flex items-center gap-4">
-        {user ? (
-          <>
-            {/* Welcome */}
-            <span className="hidden sm:block">
-              Hello, <span className="font-semibold">{user.username}</span>
-            </span>
+            <input
+              style={{
+                border: "2px solid black",
+                borderRadius: "3px",
+                width: "100%",
+                marginTop: "30px",
+              }}
+              className="input p-3 mt-4"
+              type="password"
+              value={password}
+              placeholder="Enter your Password"
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
+            />
 
-            {/* Links */}
-            <Link to="/allTransactions" className="hover:underline">
-              Dashboard
+            <div className="card-actions justify-center mt-5"></div>
+            <button className="btn btn-primary">Login</button>
+          </form>
+          <span className="flex justify-center" style={{ color: "red" }}>
+            {error}
+          </span>
+          <div>
+            <Link className="p-5" to="/register">
+              New User? SignUp
             </Link>
-
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="hover:underline">
-              Login
+            <Link className="p-5" to="/forgotPassword">
+              Forgot Password?
             </Link>
-            <Link to="/register" className="hover:underline">
-              Signup
-            </Link>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Navbar;
+export default Login;
