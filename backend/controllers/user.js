@@ -99,8 +99,8 @@ module.exports.login = async (req, res) => {
       });
       res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false,
+        secure: true, // ✅ REQUIRED for production (HTTPS)
+        sameSite: "None", // ✅ REQUIRED for cross-origin
       });
       res.send(user);
     } else {
@@ -112,11 +112,11 @@ module.exports.login = async (req, res) => {
 };
 
 module.exports.logout = async (req, res) => {
-  res
-    .cookie("token", null, {
-      expires: new Date(Date.now()),
-    })
-    .send("Logout Successfull");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true, // ✅ must match login cookie
+    sameSite: "None", // ✅ must match login cookie
+  });
 };
 
 module.exports.getProfile = async (req, res) => {
