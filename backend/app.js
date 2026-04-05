@@ -9,7 +9,7 @@ require("dotenv").config();
 
 app.use(
   cors({
-    origin: "http://localhost:4000",
+    origin: "https://finance-tracker-lemon-eta.vercel.app",
     credentials: true,
   }),
 );
