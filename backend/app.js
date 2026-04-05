@@ -7,9 +7,22 @@ const cookie = require("cookie-parser");
 const cors = require("cors");
 require("dotenv").config();
 
+const allowedOrigins = [
+  "https://finance-tracker-lemon-eta.vercel.app",
+  "http://localhost:4000",
+];
+
 app.use(
   cors({
-    origin: "https://finance-tracker-lemon-eta.vercel.app",
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow Postman
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
