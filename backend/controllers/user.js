@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { Resend } = require("resend");
+const axios = require("axios");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -203,19 +204,32 @@ module.exports.forgotPassword = async (req, res) => {
       expires: Date.now() + 5 * 60 * 1000,
     });
 
-    // ✅ SEND RESPONSE IMMEDIATELY
-    res.send("OTP sent to email");
+    // ✅ Send email via Brevo
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          email: "solankivaibhav589@gmail.com", // your email
+          name: "Finance Tracker",
+        },
+        to: [{ email }],
+        subject: "Password Reset OTP",
+        textContent: `Your OTP is ${otp}`,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
-    await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: email,
-      subject: "Password Reset OTP",
-      text: `Your OTP is ${otp}`,
-    });
+    console.log("✅ OTP Email sent via Brevo");
 
-    console.log("✅ Email sent via Resend");
+    return res.send("OTP sent to email");
   } catch (err) {
-    console.log("❌ Resend error:", err);
+    console.log("❌ Brevo Error:", err.response?.data || err.message);
+    return res.status(500).send("Failed to send OTP");
   }
 };
 
