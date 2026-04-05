@@ -222,6 +222,12 @@ module.exports.forgotPassword = async (req, res) => {
         subject: "Password Reset OTP",
         text: `Your OTP is ${otp}`,
       })
+      .then((info) => {
+        console.log("✅ Email sent:", info);
+      })
+      .catch((err) => {
+        console.log("❌ Mail error FULL:", JSON.stringify(err, null, 2));
+      })
       .then(() => console.log("✅ Email sent"))
 
       .catch((err) => console.log("❌ Mail error:", err));
