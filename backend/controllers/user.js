@@ -33,7 +33,7 @@ module.exports.signUp = async (req, res) => {
 
     // ✅ Send email FIRST
     await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: "solankivaibhav589@gmail.com",
       to: email,
       subject: "Signup OTP Verification",
       text: `Your OTP is ${otp}`,
