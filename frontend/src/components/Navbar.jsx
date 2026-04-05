@@ -44,6 +44,10 @@ const Navbar = () => {
               Dashboard
             </Link>
 
+            <Link to="/profile" className="hover:underline">
+              Profile
+            </Link>
+
             {/* Logout */}
             <button
               onClick={handleLogout}
