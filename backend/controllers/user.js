@@ -201,6 +201,8 @@ module.exports.forgotPassword = async (req, res) => {
 
     // ✅ SEND RESPONSE IMMEDIATELY
     res.send("OTP sent to email");
+    console.log("MAIL USER:", process.env.EMAIL_USER);
+    console.log("MAIL PASS:", process.env.EMAIL_PASS);
 
     const transporter = nodemailer.createTransport({
       host: "sandbox.smtp.mailtrap.io",
