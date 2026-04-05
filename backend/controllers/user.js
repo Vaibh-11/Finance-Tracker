@@ -210,6 +210,8 @@ module.exports.forgotPassword = async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
+    console.log("MAIL USER:", process.env.EMAIL_USER);
+    console.log("MAIL PASS:", process.env.EMAIL_PASS);
 
     transporter
       .sendMail({
@@ -219,6 +221,7 @@ module.exports.forgotPassword = async (req, res) => {
         text: `Your OTP is ${otp}`,
       })
       .then(() => console.log("✅ Email sent"))
+
       .catch((err) => console.log("❌ Mail error:", err));
   } catch (err) {
     console.log(err);
