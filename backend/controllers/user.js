@@ -29,17 +29,25 @@ module.exports.signUp = async (req, res) => {
 
     otpStore.set(email, { username, email, password, otp });
 
+    console.log("Sending signup OTP to:", email);
+
     // ✅ Send email FIRST
     await resend.emails.send({
       from: "onboarding@resend.dev",
       to: email,
-      subject: "Password Reset OTP",
+      subject: "Signup OTP Verification",
       text: `Your OTP is ${otp}`,
     });
 
     console.log("✅ Email sent via Resend");
+
+    // ✅ VERY IMPORTANT
+    return res.status(200).send("OTP sent to email");
   } catch (err) {
     console.log("❌ Resend error:", err);
+
+    // ✅ VERY IMPORTANT
+    return res.status(500).send("Failed to send OTP");
   }
 };
 
