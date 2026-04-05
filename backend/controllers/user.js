@@ -33,17 +33,13 @@ module.exports.signUp = async (req, res) => {
     await resend.emails.send({
       from: "onboarding@resend.dev",
       to: email,
-      subject: "Signup OTP Verification",
+      subject: "Password Reset OTP",
       text: `Your OTP is ${otp}`,
     });
 
-    console.log("✅ Signup Email sent via Resend");
-
-    // ✅ THEN send response
-    res.send("OTP sent to email");
+    console.log("✅ Email sent via Resend");
   } catch (err) {
     console.log("❌ Resend error:", err);
-    res.status(500).send("Failed to send OTP");
   }
 };
 
