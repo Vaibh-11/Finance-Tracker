@@ -35,8 +35,10 @@ app.use("/transaction", transactionRouter);
 connectDB()
   .then(() => {
     console.log("Database Connected Succesfully");
-    app.listen(process.env.PORT, () => {
-      console.log("Server Start Successfully");
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+      console.log("Server Start Successfully on", PORT);
     });
   })
   .catch((err) => {
