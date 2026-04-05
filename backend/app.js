@@ -44,3 +44,7 @@ connectDB()
   .catch((err) => {
     console.log("Error Successfully");
   });
+
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
